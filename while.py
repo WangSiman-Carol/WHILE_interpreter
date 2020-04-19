@@ -8,10 +8,7 @@ def main():
     try:
         for text in sys.stdin:
                 while_parser = Lark.open('WHILE.lark', parser='lalr')
-                tree = while_parser.parse(text)
-                print(tree)
-                #print(tree.children[0].type)
-                #print("output,  ", tree.children[0].children[0])
+                #print(while_parser.parse(text))
                 interpreter = Interpreter(while_parser)
                 result = interpreter.interpret(text)
                 print(result, flush=True)              

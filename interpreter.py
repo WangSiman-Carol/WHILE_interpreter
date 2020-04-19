@@ -47,9 +47,18 @@ class Interpreter():
             rhs = self.interp(tree.children[2])
             return self.compare(lhs, relation, rhs)
         # while statement
-        elif op == "while_stmt":
+        elif op == "simple_while":
             cond = self.interp(tree.children[0])
-            if cond:
+            if cond == 1:
+                self.interp(tree.children[1])
+                self.interp(tree)
+            elif not cond and tree.children[1].data == "simple_stmt":
+                self.interp(tree.children[1].children[1])
+            else:
+                return
+        elif op == "compound_while":
+            cond = self.interp(tree.children[0])
+            if cond == 1:
                 self.interp(tree.children[1])
                 self.interp(tree)
             else:
@@ -73,7 +82,7 @@ class Interpreter():
             return
         # not
         elif op == "not":
-            return -1 * self.interp(tree.children[0])
+            return 1 if not self.interp(tree.children[0]) else 0
         # const_false
         elif op == "const_false":
             return 0
@@ -105,7 +114,7 @@ class Interpreter():
     
     def print_Result(self):
         od = OrderedDict(sorted(self.state.items()))
-        ans = ",".join(str(var) + " → " + str(value) for var, value in od.items())
+        ans = ", ".join(str(var) + " → " + str(value) for var, value in od.items())
         return "{" + ans + "}"
 
     def interpret(self, text):
