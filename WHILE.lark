@@ -2,8 +2,17 @@
 // https://github.com/lark-parser/lark
 
 ?start: stmt _NEWLINE
+
+
+// Statements grammar
+// Adapted by Siman Wang 4/18/2020
+
+?stmt: simple_stmt | compound_stmt
+
+?compound_stmt: (if_stmt | while_stmt | funcdef) (";" stmt)*
+
 // Function grammar
-funcdef: "def" NAME "(" parameters? ")" ":" suite
+funcdef: "def" NAME "(" parameters? ")" "{" suite "}"
 
 parameters: paramvalue ("," paramvalue)* ["," [ starparams | kwparams]]
           | starparams
@@ -14,26 +23,25 @@ kwparams: "**" typedparam
 ?paramvalue: typedparam ["=" test]
 ?typedparam: NAME [":" test]
 
-// Statements grammar
-// Adapted by Siman Wang 4/18/2020
-
-?stmt: simple_stmt | compound_stmt
-
-?compound_stmt: (if_stmt | while_stmt | funcdef) (";" stmt)*
+// if, while
 if_stmt: "if" ["("] test [")"] "then" suite  ["else" suite]
 while_stmt: "while" ["("] test [")"] "do" suite [";"]            -> simple_while
           | "while" ["("] test [")"] "do" "{" suite "}"        -> compound_while
 ?suite: stmt | _NEWLINE _INDENT stmt+ _DEDENT
 
+// assignment, boolean, skip
 ?simple_stmt: small_stmt (";" stmt)*
 ?small_stmt: (expr_stmt | flow_stmt | skip_stmt)
 ?skip_stmt: "skip"
 ?flow_stmt: return_stmt
 ?return_stmt: "return" [testlist]
 ?expr_stmt: bool_expr | assign_expr
+
 // Assignment expression
-?assign_expr: var ":=" expr_stmt        -> assign
-            | atom_expr ":=" expr   ->array_assign
+?assign_expr: var ":=" expr_stmt       -> assign
+            | atom_expr ":=" expr      -> array_assign
+            | var ":=" test "?" test ":" test     -> ternary_assign
+
 var: NAME
 // Boolean expression
 ?bool_expr: test
@@ -90,7 +98,7 @@ testlist: test ("," test)* [","]
 arguments: argvalue ("," argvalue)*  ("," [ starargs | kwargs])?
          | starargs
          | kwargs
-         | test comp_for
+         //| test comp_for
 
 starargs: "*" test ("," "*" test)* ("," argvalue)* ["," kwargs]
 kwargs: "**" test

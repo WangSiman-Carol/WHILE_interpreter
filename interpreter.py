@@ -35,12 +35,12 @@ class Interpreter():
         # visit variable
         elif op == "var":
             return self.lookup(tree.children[0])
-        # var assignment
+        # var or array assignment
         elif op == "assign":
             variable = tree.children[0].children[0]
             value = self.interp(tree.children[1])
             self.state[variable] = value
-                # comparison
+        # comparison
         elif op == "comparison":
             lhs = self.interp(tree.children[0])
             relation = tree.children[1]
@@ -88,6 +88,7 @@ class Interpreter():
             return 0
         elif op == "const_true":
             return 1
+        # or, and
         elif op == "or_test":
             lhs = self.interp(tree.children[0])
             rhs = self.interp(tree.children[1])
@@ -96,6 +97,44 @@ class Interpreter():
             lhs = self.interp(tree.children[0])
             rhs = self.interp(tree.children[1])
             return lhs and rhs
+        elif op == "ternary_assign":
+            variable = tree.children[0].children[0]
+            cond = self.interp(tree.children[1])
+            if cond:
+                self.state[variable] = self.interp(tree.children[2])
+            else:
+                self.state[variable] = self.interp(tree.children[3])
+            return
+        # array
+        elif op == "array":
+            array = self.interp(tree.children[0])
+            return array
+        elif op == "testlist_comp":
+            children_num = len(tree.children)
+            elems = []
+            for i in range(children_num):
+                elems.append(self.interp(tree.children[i]))
+            return elems
+        # accept arguments
+        elif op == 'arguments':
+            children_num = len(tree.children)
+            args = []
+            for i in range(children_num):
+                args.append(self.interp(tree.children[i]))
+            return args
+        # get items in array
+        elif op == "getitem":
+            variable = tree.children[0].children[0]
+            subscripts = self.interp(tree.children[1])
+            return self.state[variable][subscripts[0]]
+        elif op == "subscriptlist":
+            children_num = len(tree.children)
+            _subscripts = []
+            for i in range(children_num):
+                _subscripts.append(self.interp(tree.children[i]))
+            return _subscripts
+        elif op == "subscript":
+            return self.interp(tree.children[0])
 
 
     def compare(self, left, relation, right):
