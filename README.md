@@ -1,6 +1,7 @@
 ## requirements
 python 3.6
-lark 
+
+open-source parser library: lark 
 
 ## Compile and run 
 make

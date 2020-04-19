@@ -1,12 +1,8 @@
-// Reference: Lark, an open source parser.
-// https://github.com/lark-parser/lark
+// Siman Wang 4/18/2020
 
 ?start: stmt _NEWLINE
 
-
 // Statements grammar
-// Adapted by Siman Wang 4/18/2020
-
 ?stmt: simple_stmt | compound_stmt
 
 ?compound_stmt: (if_stmt | while_stmt | funcdef) (";" stmt)*

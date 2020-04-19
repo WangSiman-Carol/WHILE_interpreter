@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Reference: Lark, an open source parser.
+# https://github.com/lark-parser/lark
 
 import sys
 from lark import Lark
